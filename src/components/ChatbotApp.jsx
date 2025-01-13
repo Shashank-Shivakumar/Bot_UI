@@ -56,6 +56,21 @@ function ChatbotApp() {
     }
   };
 
+  const generateDownloadLink = (filePath) => {
+    try {
+      // Simulating file content for demonstration
+      const fileContent = "Sample file content"; // Replace with actual file content if necessary
+      const fileName = filePath.split("/").pop(); // Extract file name
+      const mimeType = "application/octet-stream";
+      const b64File = btoa(fileContent); // Convert file content to Base64
+
+      return `data:${mimeType};base64,${b64File}`;
+    } catch (error) {
+      console.error("Error generating download link:", error);
+      return null;
+    }
+  };
+
   const renderBotMessage = (message, index) => {
     if (message.text) {
       return (
@@ -81,15 +96,23 @@ function ChatbotApp() {
     if (message.custom) {
       const payload = message.custom;
       if (payload.type === "download_file") {
-        const fileUrl = `actions/download_file/${payload.file_name}`;
-        return (
-          <div key={index} style={{ margin: "10px 0" }}>
-            <strong style={{ color: "#00C853" }}>Bot:</strong>{" "}
-            <a href={fileUrl} download style={{ color: "#007BFF" }}>
-              Download File
-            </a>
-          </div>
-        );
+        const fileUrl = generateDownloadLink(payload.file_name);
+        if (fileUrl) {
+          return (
+            <div key={index} style={{ margin: "10px 0" }}>
+              <strong style={{ color: "#00C853" }}>Bot:</strong>{" "}
+              <a href={fileUrl} download={payload.file_name} style={{ color: "#007BFF" }}>
+                Download File
+              </a>
+            </div>
+          );
+        } else {
+          return (
+            <div key={index} style={{ margin: "10px 0" }}>
+              <strong style={{ color: "#00C853" }}>Bot:</strong> Error generating download link.
+            </div>
+          );
+        }
       }
 
       if (payload.type === "select_options") {
